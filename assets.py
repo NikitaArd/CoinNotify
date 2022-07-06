@@ -2,6 +2,7 @@
 File with all assets (ex. messages, tokens ...)
 """
 
+#Excample token
 TOKEN = '1990937525:AAGHeIl5ogbh7eSNC6plAy1rDV_WZtJ1SAM'
 
 start_answer = """
