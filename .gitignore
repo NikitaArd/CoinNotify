@@ -1,0 +1,6 @@
+.DS_store
+.idea
+*/__pycache__
+__pycache__
+.env
+*.db
