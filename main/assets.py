@@ -9,8 +9,8 @@ File with all assets (ex. messages, tokens ...)
 # Settings
 TOKEN = os.getenv('TOKEN')
 DB_NAME = os.getenv('DATABASE_NAME')
-TIME_UNIT = 'm'  # h - hours, m - minutes
-INTERVAL = 1  # interval in TIME_UNIT
+TIME_UNIT = 'h'  # h - hours, m - minutes
+INTERVAL = 8  # interval in TIME_UNIT
 
 # Assets
 start_answer = """
