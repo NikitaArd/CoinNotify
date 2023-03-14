@@ -14,11 +14,11 @@ TIME_UNIT = 'm'  # h - hours, m - minutes
 INTERVAL = 1  # interval in TIME_UNIT
 
 # DataBase Settings
-DB_NAME = os.getenv('DB_NAME')
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_HOST = os.getenv('DB_HOST')
-DB_PORT = os.getenv('DB_PORT')
+DB_NAME = os.getenv('PGDATABASE')
+DB_USER = os.getenv('PGUSER')
+DB_PASSWORD = os.getenv('PGPASSWORD')
+DB_HOST = os.getenv('PGHOST')
+DB_PORT = os.getenv('PGPORT ')
 
 # Assets
 start_answer = """
