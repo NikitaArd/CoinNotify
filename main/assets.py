@@ -10,8 +10,8 @@ File with all assets (ex. messages, tokens ...)
 TOKEN = os.getenv('TOKEN')
 
 # Scheduler settings
-TIME_UNIT = 'm'  # h - hours, m - minutes
-INTERVAL = 1  # interval in TIME_UNIT
+TIME_UNIT = os.getenv('TIME_UNIT')  # h - hours, m - minutes
+INTERVAL = os.getenv('INTERVAL')  # interval in TIME_UNIT
 
 # DataBase Settings
 DB_NAME = os.getenv('PGDATABASE')

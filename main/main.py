@@ -60,9 +60,9 @@ def main():
 if __name__ == '__main__':
     scheduler = BackgroundScheduler()
     if TIME_UNIT == 'h':
-        scheduler.add_job(mailing, 'interval', hours=INTERVAL)
+        scheduler.add_job(mailing, 'interval', hours=int(INTERVAL))
     elif TIME_UNIT == 'm':
-        scheduler.add_job(mailing, 'interval', minutes=INTERVAL)
+        scheduler.add_job(mailing, 'interval', minutes=int(INTERVAL))
     else:
         logging('error', 'Invalid time unit')
         sys.exit()
