@@ -6,11 +6,19 @@ load_dotenv()
 File with all assets (ex. messages, tokens ...)
 """
 
-# Settings
+# Bot Settings
 TOKEN = os.getenv('TOKEN')
-DB_NAME = os.getenv('DATABASE_NAME')
-TIME_UNIT = 'h'  # h - hours, m - minutes
-INTERVAL = 8  # interval in TIME_UNIT
+
+# Scheduler settings
+TIME_UNIT = 'm'  # h - hours, m - minutes
+INTERVAL = 1  # interval in TIME_UNIT
+
+# DataBase Settings
+DB_NAME = os.getenv('DB_NAME')
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_HOST = os.getenv('DB_HOST')
+DB_PORT = os.getenv('DB_PORT')
 
 # Assets
 start_answer = """

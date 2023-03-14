@@ -1,27 +1,47 @@
-import sqlite3
+import psycopg2
 
 from pycoingecko import CoinGeckoAPI
 import datetime
 
+from assets import (
+    DB_NAME,
+    DB_USER,
+    DB_PASSWORD,
+    DB_HOST,
+    DB_PORT,
+)
+
 
 class DBController:
-    # Connecting or Creating DataBase
+    DB_NAME = DB_NAME
+    DB_USER = DB_USER
+    DB_PASSWORD = DB_PASSWORD
+    DB_HOST = DB_HOST
+    DB_PORT = DB_PORT
+
     def __init__(self, db_name):
         self.DBName = db_name
-        with sqlite3.connect(db_name, check_same_thread=False) as db:
+        with psycopg2.connect(database=self.DB_NAME,
+                              user=self.DB_USER,
+                              password=self.DB_PASSWORD,
+                              host=self.DB_HOST,
+                              port=self.DB_PORT) as db:
             self.cur = db.cursor()
             self.conn = db
 
             self.cur.execute("""CREATE TABLE IF NOT EXISTS subers(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             firstname TEXT,
             lastname TEXT,
-            user_id TEXT, 
+            user_id TEXT NOT NULL, 
             status BOOLEAN);""")
+            self.conn.commit()
 
     # Returning Something if Subscriber exists and Nothing if Subscriber doesn't exist
     def check_user_in_db(self, id_of_user):
-        return self.cur.execute(f"SELECT * FROM subers WHERE user_id = {id_of_user}").fetchall()
+        self.cur.execute(f"SELECT * FROM subers WHERE user_id = '{id_of_user}';")
+        return self.cur.fetchall()
+
 
     # Creating new Subscriber
     def add_user(self, id_of_user, firstname, lastname, status=False):
@@ -33,7 +53,7 @@ class DBController:
     # Updating Subscriber newsletter status OR creating new Subscriber in database
     def newsletter_status(self, id_of_user, firstname, lastname, status):
         if self.check_user_in_db(id_of_user):
-            self.cur.execute(f"UPDATE subers set status = {status} WHERE user_id = {id_of_user}")
+            self.cur.execute(f"UPDATE subers set status = {status} WHERE user_id = '{id_of_user}';")
             self.conn.commit()
             logging('updating', 'User', id_of_user, firstname, lastname, status)
         else:
@@ -41,8 +61,8 @@ class DBController:
 
     # Returning all Subscribers with given status
     def get_users_with_status(self, status):
-        response = self.cur.execute(f"SELECT * FROM `subers` WHERE status={status}").fetchall()
-        return list(response)
+        self.cur.execute(f"SELECT * FROM subers WHERE status='{status}';")
+        return list(self.cur.fetchall())
 
 
 # Returning format answer with Data
