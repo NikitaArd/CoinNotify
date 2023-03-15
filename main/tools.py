@@ -2,6 +2,7 @@ import psycopg2
 
 from pycoingecko import CoinGeckoAPI
 import datetime
+import re
 
 from assets import (
     DB_NAME,
@@ -34,7 +35,8 @@ class DBController:
             firstname TEXT,
             lastname TEXT,
             user_id TEXT NOT NULL, 
-            status BOOLEAN);""")
+            status BOOLEAN,
+            timezone INT);""")
             self.conn.commit()
 
     # Returning Something if Subscriber exists and Nothing if Subscriber doesn't exist
@@ -42,13 +44,13 @@ class DBController:
         self.cur.execute(f"SELECT * FROM subers WHERE user_id = '{id_of_user}';")
         return self.cur.fetchall()
 
-
     # Creating new Subscriber
-    def add_user(self, id_of_user, firstname, lastname, status=False):
-        self.cur.execute(
-            f"INSERT INTO subers(firstname, lastname ,user_id, status) VALUES('{firstname}', '{lastname}', '{id_of_user}', '{status}');")
-        self.conn.commit()
-        logging('adding', 'New user', id_of_user, firstname, lastname, status)
+    def add_user(self, id_of_user, firstname, lastname, timezone, status=False):
+        if not self.check_user_in_db(id_of_user):
+            self.cur.execute(
+                f"INSERT INTO subers(firstname, lastname ,user_id, status, timezone) VALUES('{firstname}', '{lastname}', '{id_of_user}', '{status}', {timezone});")
+            self.conn.commit()
+            logging('adding', 'New user', id_of_user, firstname, lastname, status)
 
     # Updating Subscriber newsletter status OR creating new Subscriber in database
     def newsletter_status(self, id_of_user, firstname, lastname, status):
@@ -88,3 +90,13 @@ def get_parse_data():
 # Printing the specified information
 def logging(verb: str, *args):
     print(f'[ {verb.upper()} ] {" ".join([str(x) for x in args])}')
+
+
+def calc_timezone(user_time: str) -> int:
+    return int(user_time.split(':')[0]) - int(datetime.datetime.utcnow().strftime('%H'))
+
+
+def validate_user_time(input_time: str) -> bool:
+    if re.match(r'^([0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', input_time):
+        return True
+    return False

@@ -1,5 +1,6 @@
 import telebot
 from apscheduler.schedulers.background import BackgroundScheduler
+
 import sys
 
 # Local imports
@@ -7,7 +8,9 @@ from assets import *
 from tools import (
     DBController,
     get_parse_data,
-    logging
+    logging,
+    validate_user_time,
+    calc_timezone,
 )
 
 bot = telebot.TeleBot(TOKEN)
@@ -24,15 +27,29 @@ def mailing():
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    db.add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name)
     bot.send_message(message.chat.id, start_answer)
+    bot.register_next_step_handler(message, process_get_time_step)
+
+
+def process_get_time_step(message):
+    if validate_user_time(message.text):
+        db.add_user(
+            message.from_user.id,
+            message.from_user.first_name,
+            message.from_user.last_name,
+            calc_timezone(message.text)
+        )
+        bot.send_message(message.chat.id, f'Twój TZ to UTC {calc_timezone(message.text)}')
+    else:
+        bot.send_message(message.chat.id, 'Wpisz jeszcze raz')
+        bot.register_next_step_handler(message, process_get_time_step)
 
 
 @bot.message_handler(commands=['add'])
 def add(message):
     db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
     bot.send_message(message.chat.id, newsletter_add)
-    
+
 
 @bot.message_handler(commands=['unadd'])
 def unadd(message):
