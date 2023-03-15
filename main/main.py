@@ -28,6 +28,7 @@ def mailing():
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id, start_answer)
+    bot.send_message(message.chat.id, 'Którą jest terz godzina ? To pomoże mi ustawić dla ciebie odpowiednią strefę czasową.')
     bot.register_next_step_handler(message, process_get_time_step)
 
 
@@ -39,10 +40,32 @@ def process_get_time_step(message):
             message.from_user.last_name,
             calc_timezone(message.text)
         )
-        bot.send_message(message.chat.id, f'Twój TZ to UTC {calc_timezone(message.text)}')
+        bot.send_message(message.chat.id, 'Twoja strefa czasowa sostała ustawiona')
     else:
         bot.send_message(message.chat.id, 'Wpisz jeszcze raz')
         bot.register_next_step_handler(message, process_get_time_step)
+
+
+@bot.message_handler(commands=['set_time'])
+def set_time(message):
+    bot.send_message(message.chat.id, 'Wpisz po przecinku czas o której chcesz dostawać NewsLetter. (czas podany w formacie 24 i liczba minut musi być wielokrotnością 10)')
+    bot.register_next_step_handler(message, process_set_schedule_step)
+
+
+def process_set_schedule_step(message):
+    user_time_list = message.text.replace(' ', '').split(',')
+    for t in user_time_list:
+        if not validate_user_time(t, True):
+            bot.send_message(message.chat.id, 'Wpisz czas w poprawny sposób')
+            bot.register_next_step_handler(message, process_set_schedule_step)
+            return
+
+    if not db.set_user_schedule(message.from_user.id, user_time_list):
+        bot.send_message(message.chat.id, 'Spróbuj jeszcze raz')
+        bot.register_next_step_handler(message, process_set_schedule_step)
+
+    bot.send_message(message.chat.id,
+                     'Hura ! Teraz będę wysyłał do ciebie wiadomości o {}, {} i o {}'.format(*user_time_list))
 
 
 @bot.message_handler(commands=['add'])

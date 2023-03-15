@@ -36,7 +36,10 @@ class DBController:
             lastname TEXT,
             user_id TEXT NOT NULL, 
             status BOOLEAN,
-            timezone INT);""")
+            timediff INT,            
+            first_time TEXT,
+            second_time TEXT,
+            third_time TEXT);""")
             self.conn.commit()
 
     # Returning Something if Subscriber exists and Nothing if Subscriber doesn't exist
@@ -45,12 +48,26 @@ class DBController:
         return self.cur.fetchall()
 
     # Creating new Subscriber
-    def add_user(self, id_of_user, firstname, lastname, timezone, status=False):
+    def add_user(self, id_of_user, firstname, lastname, timediff, status=False):
         if not self.check_user_in_db(id_of_user):
             self.cur.execute(
-                f"INSERT INTO subers(firstname, lastname ,user_id, status, timezone) VALUES('{firstname}', '{lastname}', '{id_of_user}', '{status}', {timezone});")
+                f"INSERT INTO subers(firstname, lastname ,user_id, status, timediff) VALUES('{firstname}', '{lastname}', '{id_of_user}', '{status}', {timediff});")
             self.conn.commit()
             logging('adding', 'New user', id_of_user, firstname, lastname, status)
+
+    # Set time to send newsletter
+    def set_user_schedule(self, id_of_user, time_list: list):
+        if len(time_list) != 3:
+            return False
+
+        self.cur.execute(f"SELECT timediff FROM subers WHERE user_id = '{id_of_user}';")
+        user_tz = self.cur.fetchone()[0]
+        time_list = [''.join([str(int(x.split(':')[0]) - user_tz), ':', x.split(':')[1]]) for x in time_list]
+
+        self.cur.execute(f"UPDATE subers SET first_time = '{time_list[0]}', second_time = '{time_list[1]}', third_time = '{time_list[2]}' WHERE user_id = '{id_of_user}';")
+        self.conn.commit()
+
+        return True
 
     # Updating Subscriber newsletter status OR creating new Subscriber in database
     def newsletter_status(self, id_of_user, firstname, lastname, status):
@@ -93,10 +110,12 @@ def logging(verb: str, *args):
 
 
 def calc_timezone(user_time: str) -> int:
-    return int(user_time.split(':')[0]) - int(datetime.datetime.utcnow().strftime('%H'))
+    return int(user_time.split(':')[0]) - int(datetime.datetime.now().strftime('%H'))
 
 
-def validate_user_time(input_time: str) -> bool:
+def validate_user_time(input_time: str, validate_minutes=False) -> bool:
     if re.match(r'^([0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', input_time):
-        return True
+        # If validate_minute True, function validate if user enter <minutes> % 10
+        return True and (not bool(int(input_time.split(':')[1]) % 10) or not validate_minutes)
+
     return False
