@@ -23,7 +23,9 @@ DB_PORT = os.getenv('PGPORT ')
 # Assets
 start_answer = """
 Witam!
-Jestem CryptoBot, pomogę ci sprawdzić kurs Bitcoin-a i Ethereum-a
+Jestem CryptoBot, pomogę ci sprawdzić kurs Bitcoin i Ethereum
+
+Wpisz /add aby zapisać się do Newsletter.
 
 Jeśli masz pytania nie bój się pisać /help!
 """
@@ -32,11 +34,10 @@ help_answer = """
 Cześć!
 Widzę że potrzebujesz pomocy.
 Komendy:
-Wpisz /crypto aby sprawdić kurs Bitcoin-a i Ethereum-a
+Wpisz /crypto aby sprawdić kurs Bitcoin i Ethereum
 Wpisz /add aby zapisać się do Newsletter
 Wpisz /unadd aby wypisać się z Newsletter
 Informacja:
-Telegram Bot jest napisany w języku programowania Python
 
 Twórca Nikita Smolenskyi
 GitHub : https://github.com/NikitaArd?tab=repositories
