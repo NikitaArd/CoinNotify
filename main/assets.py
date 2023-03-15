@@ -30,6 +30,48 @@ Wpisz /add aby zapisać się do Newsletter.
 Jeśli masz pytania nie bój się pisać /help!
 """
 
+set_schedule_success = """
+Hura! Czas został ustawiony.
+Teraz będę wysyłał do ciebie wiadomości o:
+{}
+{}
+{}
+
+Pomyślnie zostałeś zapizany od Newsletter.
+"""
+
+time_tz_advice = """
+Którą godzinę masz teraz ?
+
+To pomoże mi ustawić twóją strefę czasową. :hourglass:
+"""
+
+invalid_time_tz = """
+Wprowadż godzinę w formacie 24
+
+Przykład:
+10:30"""
+
+time_tz_ok = """
+Twoje dane zostały zapisane.
+Wpisz /help aby dowiedzieć się więcej.
+"""
+
+time_format_advice = """
+Wpisz po przecinku Godzinę o której chcesz dostawać wiadomości.
+Pamiętaj aby godzina była podana w formacie 24 i liczba minut była wielokrotnością 10
+
+Przykład:
+10:30, 14:30, 22:40"""
+
+invalid_time = """
+Czas został wprowadzony w błędny sposób.
+Spróbuj jeszcze raz.
+
+Przykład:
+10:30, 14:30, 22:40
+"""
+
 help_answer = """
 Cześć!
 Widzę że potrzebujesz pomocy.

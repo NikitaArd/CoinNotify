@@ -1,3 +1,5 @@
+import datetime
+
 import telebot
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -17,22 +19,30 @@ bot = telebot.TeleBot(TOKEN)
 db = DBController(DB_NAME)
 
 
-def mailing():
+def check_time():
+    # If minutes are multiple of 10 ( every 10 minutes do mailing() )
+    if not int(datetime.datetime.now().strftime('%M')) % 10:
+        mailing(datetime.datetime.now().strftime('%H:%M'))
+
+
+def mailing(cur_time):
     subers = db.get_users_with_status(True)
     table = get_parse_data()
-    logging('mailing', len(subers), 'subscribers')
+    logging('mailing')
     for s in subers:
-        bot.send_message(s[3], table)
+        if cur_time in s[6:len(s)]:
+            bot.send_message(s[3], table)
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id, start_answer)
-    bot.send_message(message.chat.id, 'Którą jest terz godzina ? To pomoże mi ustawić dla ciebie odpowiednią strefę czasową.')
+    bot.send_message(message.chat.id, time_tz_advice)
     bot.register_next_step_handler(message, process_get_time_step)
 
 
 def process_get_time_step(message):
+    # Validate user input time
     if validate_user_time(message.text):
         db.add_user(
             message.from_user.id,
@@ -40,32 +50,37 @@ def process_get_time_step(message):
             message.from_user.last_name,
             calc_timezone(message.text)
         )
-        bot.send_message(message.chat.id, 'Twoja strefa czasowa sostała ustawiona')
+        bot.send_message(message.chat.id, time_tz_ok)
     else:
-        bot.send_message(message.chat.id, 'Wpisz jeszcze raz')
+        bot.send_message(message.chat.id, invalid_time_tz)
         bot.register_next_step_handler(message, process_get_time_step)
 
 
 @bot.message_handler(commands=['set_time'])
 def set_time(message):
-    bot.send_message(message.chat.id, 'Wpisz po przecinku czas o której chcesz dostawać NewsLetter. (czas podany w formacie 24 i liczba minut musi być wielokrotnością 10)')
+    bot.send_message(message.chat.id, time_format_advice)
     bot.register_next_step_handler(message, process_set_schedule_step)
 
 
 def process_set_schedule_step(message):
+    # Getting user input time ['HH:MM', 'HH:MM', 'HH:MM']
     user_time_list = message.text.replace(' ', '').split(',')
+
+    # Validate user input time
     for t in user_time_list:
         if not validate_user_time(t, True):
-            bot.send_message(message.chat.id, 'Wpisz czas w poprawny sposób')
+            bot.send_message(message.chat.id, invalid_time)
+            # If isn't valid ask about time again
             bot.register_next_step_handler(message, process_set_schedule_step)
             return
 
+    # Try to write data in to database
     if not db.set_user_schedule(message.from_user.id, user_time_list):
-        bot.send_message(message.chat.id, 'Spróbuj jeszcze raz')
+        bot.send_message(message.chat.id, invalid_time)
         bot.register_next_step_handler(message, process_set_schedule_step)
 
-    bot.send_message(message.chat.id,
-                     'Hura ! Teraz będę wysyłał do ciebie wiadomości o {}, {} i o {}'.format(*user_time_list))
+    db.newsletter_status(True)
+    bot.send_message(message.chat.id, set_schedule_success.format(*user_time_list))
 
 
 @bot.message_handler(commands=['add'])
@@ -100,9 +115,9 @@ def main():
 if __name__ == '__main__':
     scheduler = BackgroundScheduler()
     if TIME_UNIT == 'h':
-        scheduler.add_job(mailing, 'interval', hours=int(INTERVAL))
+        scheduler.add_job(check_time, 'interval', hours=int(INTERVAL))
     elif TIME_UNIT == 'm':
-        scheduler.add_job(mailing, 'interval', minutes=int(INTERVAL))
+        scheduler.add_job(check_time, 'interval', minutes=int(INTERVAL))
     else:
         logging('error', 'Invalid time unit')
         sys.exit()
