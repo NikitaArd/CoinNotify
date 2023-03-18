@@ -88,6 +88,11 @@ class DBController:
         self.cur.execute(f"SELECT * FROM subers WHERE status='{status}';")
         return list(self.cur.fetchall())
 
+    def get_user_status(self, id_of_user):
+        self.cur.execute(f"SELECT status, first_time, second_time, third_time FROM subers WHERE user_id='{id_of_user}';")
+        data = self.cur.fetchone()
+        return data[0], data[1::]
+
 
 # Returning format answer with Data
 def get_parse_data():

@@ -41,6 +41,17 @@ Pomyślnie zostałeś zapizany do Newsletter.
 Jeśli chcesz zmienić czas - wpisz /change_time
 """
 
+already_subscribed = """
+Już jesteś zapiany do Newslettera.
+
+Twój ustawiony czas:
+{}
+{}
+{}
+
+Jeśli chcesz zmienić czas - wpisz /change_time
+"""
+
 time_tz_advice = """
 Którą godzinę masz teraz ?
 

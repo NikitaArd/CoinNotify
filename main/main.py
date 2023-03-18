@@ -80,6 +80,7 @@ def process_set_schedule_step(message):
 @bot.message_handler(commands=['change_time'])
 def change_schedule(message):
     bot.send_message(message.chat.id, 'Ustaw nowy czas')
+    bot.send_message(message.chat.id, time_format_advice)
     bot.register_next_step_handler(message, process_set_schedule_step)
 
 
@@ -91,8 +92,13 @@ def add(message):
         bot.send_message(message.chat.id, time_format_advice)
         bot.register_next_step_handler(message, process_set_schedule_step)
     else:
-        db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
-        bot.send_message(message.chat.id, set_schedule_success.format(*user_time))
+        cur_user_status, cur_user_set_time = db.get_user_status(message.from_user.id)
+        # If user already subscribed send an appropriate answer
+        if cur_user_status:
+            bot.send_message(message.chat.id, already_subscribed.format(*cur_user_set_time))
+        else:
+            db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
+            bot.send_message(message.chat.id, set_schedule_success.format(*user_time))
 
 
 @bot.message_handler(commands=['unadd'])
