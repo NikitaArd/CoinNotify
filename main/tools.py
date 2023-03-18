@@ -1,6 +1,6 @@
 import psycopg2
 
-from pycoingecko import CoinGeckoAPI
+import cryptocompare
 import datetime
 import re
 
@@ -47,6 +47,10 @@ class DBController:
         self.cur.execute(f"SELECT * FROM subers WHERE user_id = '{id_of_user}';")
         return self.cur.fetchall()
 
+    def check_user_set_time(self, id_of_user):
+        self.cur.execute(f"SELECT first_time, second_time, third_time FROM subers WHERE user_id = '{id_of_user}';")
+        return self.cur.fetchone()
+
     # Creating new Subscriber
     def add_user(self, id_of_user, firstname, lastname, timediff, status=False):
         if not self.check_user_in_db(id_of_user):
@@ -64,7 +68,8 @@ class DBController:
         user_tz = self.cur.fetchone()[0]
         time_list = [''.join([str(int(x.split(':')[0]) - user_tz), ':', x.split(':')[1]]) for x in time_list]
 
-        self.cur.execute(f"UPDATE subers SET first_time = '{time_list[0]}', second_time = '{time_list[1]}', third_time = '{time_list[2]}' WHERE user_id = '{id_of_user}';")
+        self.cur.execute(
+            f"UPDATE subers SET first_time = '{time_list[0]}', second_time = '{time_list[1]}', third_time = '{time_list[2]}' WHERE user_id = '{id_of_user}';")
         self.conn.commit()
 
         return True
@@ -86,19 +91,18 @@ class DBController:
 
 # Returning format answer with Data
 def get_parse_data():
-    cg = CoinGeckoAPI()
-    rate_b = cg.get_price(ids='bitcoin', vs_currencies='usd')
-    rate_e = cg.get_price(ids='ethereum', vs_currencies='usd')
-    time = datetime.datetime.now().strftime('%H:%M:%S %d-%m')
+    cs = cryptocompare.get_price(['BTC', 'ETH'], 'USD')
+    rate_b = cs['BTC']['USD']
+    rate_e = cs['ETH']['USD']
     # Answer ( what see user )
     answer = f"""
     Bitcoin :
-    💲 Kurs Bitcoin-a : {rate_b['bitcoin']['usd']}$
+    💲 Kurs Bitcoin-a : {rate_b}$
     
-    💲 Kurs Ethereum-a : {rate_e['ethereum']['usd']}$
+    💲 Kurs Ethereum-a : {rate_e}$
     
 
-    📌 Ostatnia aktualizacja : {time}
+    📌 Ostatnia aktualizacja : Teraz
 
     """
     return answer
@@ -119,3 +123,7 @@ def validate_user_time(input_time: str, validate_minutes=False) -> bool:
         return True and (not bool(int(input_time.split(':')[1]) % 10) or not validate_minutes)
 
     return False
+
+
+if __name__ == '__main__':
+    pass

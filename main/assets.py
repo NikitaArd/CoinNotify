@@ -37,7 +37,8 @@ Teraz będę wysyłał do ciebie wiadomości o:
 {}
 {}
 
-Pomyślnie zostałeś zapizany od Newsletter.
+Pomyślnie zostałeś zapizany do Newsletter.
+Jeśli chcesz zmienić czas - wpisz /change_time
 """
 
 time_tz_advice = """

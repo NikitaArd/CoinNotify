@@ -56,12 +56,6 @@ def process_get_time_step(message):
         bot.register_next_step_handler(message, process_get_time_step)
 
 
-@bot.message_handler(commands=['set_time'])
-def set_time(message):
-    bot.send_message(message.chat.id, time_format_advice)
-    bot.register_next_step_handler(message, process_set_schedule_step)
-
-
 def process_set_schedule_step(message):
     # Getting user input time ['HH:MM', 'HH:MM', 'HH:MM']
     user_time_list = message.text.replace(' ', '').split(',')
@@ -79,14 +73,26 @@ def process_set_schedule_step(message):
         bot.send_message(message.chat.id, invalid_time)
         bot.register_next_step_handler(message, process_set_schedule_step)
 
-    db.newsletter_status(True)
+    db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
     bot.send_message(message.chat.id, set_schedule_success.format(*user_time_list))
+
+
+@bot.message_handler(commands=['change_time'])
+def change_schedule(message):
+    bot.send_message(message.chat.id, 'Ustaw nowy czas')
+    bot.register_next_step_handler(message, process_set_schedule_step)
 
 
 @bot.message_handler(commands=['add'])
 def add(message):
-    db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
-    bot.send_message(message.chat.id, newsletter_add)
+    user_time = db.check_user_set_time(message.from_user.id)
+    if not user_time[0]:
+        bot.send_message(message.chat.id, "Widzę że nie masz ustawionego czasu")
+        bot.send_message(message.chat.id, time_format_advice)
+        bot.register_next_step_handler(message, process_set_schedule_step)
+    else:
+        db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
+        bot.send_message(message.chat.id, set_schedule_success.format(*user_time))
 
 
 @bot.message_handler(commands=['unadd'])
@@ -107,9 +113,9 @@ def helper(message):
 
 
 def main():
-    logging('starting', 'Starting bot work')
     scheduler.start()
-    bot.polling(none_stop=True)
+    logging('starting', 'Starting bot work')
+    bot.infinity_polling(timeout=10, long_polling_timeout=5)
 
 
 if __name__ == '__main__':
