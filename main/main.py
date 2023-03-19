@@ -26,12 +26,17 @@ def check_time():
 
 
 def mailing(cur_time):
+    # Try to Add cur_time into SQL request
     subers = db.get_users_with_status(True)
     table = get_parse_data()
-    logging('mailing')
+
+    mailing_count = 0
     for s in subers:
-        if cur_time in s[6:len(s)]:
+        if cur_time in s[6]:
+            mailing_count += 1
             bot.send_message(s[3], table)
+
+    logging('mailing', mailing_count, 'user(s)')
 
 
 @bot.message_handler(commands=['start'])
@@ -74,7 +79,7 @@ def process_set_schedule_step(message):
         bot.register_next_step_handler(message, process_set_schedule_step)
 
     db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
-    bot.send_message(message.chat.id, set_schedule_success.format(*user_time_list))
+    bot.send_message(message.chat.id, set_schedule_success.format('\n'.join(user_time_list)))
 
 
 @bot.message_handler(commands=['change_time'])
@@ -95,10 +100,10 @@ def add(message):
         cur_user_status, cur_user_set_time = db.get_user_status(message.from_user.id)
         # If user already subscribed send an appropriate answer
         if cur_user_status:
-            bot.send_message(message.chat.id, already_subscribed.format(*cur_user_set_time))
+            bot.send_message(message.chat.id, already_subscribed.format('\n'.join(cur_user_set_time)))
         else:
             db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
-            bot.send_message(message.chat.id, set_schedule_success.format(*user_time))
+            bot.send_message(message.chat.id, set_schedule_success.format('\n'.join(user_time[0])))
 
 
 @bot.message_handler(commands=['unadd'])

@@ -10,6 +10,7 @@ from assets import (
     DB_PASSWORD,
     DB_HOST,
     DB_PORT,
+    MAX_COUNT_USER_TIME
 )
 
 
@@ -19,6 +20,7 @@ class DBController:
     DB_PASSWORD = DB_PASSWORD
     DB_HOST = DB_HOST
     DB_PORT = DB_PORT
+    MAX_COUNT_USER_TIME = MAX_COUNT_USER_TIME
 
     def __init__(self, db_name):
         self.DBName = db_name
@@ -36,10 +38,8 @@ class DBController:
             lastname TEXT,
             user_id TEXT NOT NULL, 
             status BOOLEAN,
-            timediff INT,            
-            first_time TEXT,
-            second_time TEXT,
-            third_time TEXT);""")
+            timediff INT,
+            user_schedule text ARRAY[{}]);""".format(self.MAX_COUNT_USER_TIME))
             self.conn.commit()
 
     # Returning Something if Subscriber exists and Nothing if Subscriber doesn't exist
@@ -48,7 +48,7 @@ class DBController:
         return self.cur.fetchall()
 
     def check_user_set_time(self, id_of_user):
-        self.cur.execute(f"SELECT first_time, second_time, third_time FROM subers WHERE user_id = '{id_of_user}';")
+        self.cur.execute(f"SELECT user_schedule FROM subers WHERE user_id = '{id_of_user}';")
         return self.cur.fetchone()
 
     # Creating new Subscriber
@@ -61,25 +61,31 @@ class DBController:
 
     # Set time to send newsletter
     def set_user_schedule(self, id_of_user, time_list: list):
-        if len(time_list) != 3:
+        if 5 < len(time_list) < 1:
             return False
 
-        self.cur.execute(f"SELECT timediff FROM subers WHERE user_id = '{id_of_user}';")
-        user_tz = self.cur.fetchone()[0]
+        self.cur.execute(f"SELECT timediff, firstname, lastname FROM subers WHERE user_id = '{id_of_user}';")
+        data = self.cur.fetchone()
+        user_tz = data[0]
         time_list = [''.join([str(int(x.split(':')[0]) - user_tz), ':', x.split(':')[1]]) for x in time_list]
 
         self.cur.execute(
-            f"UPDATE subers SET first_time = '{time_list[0]}', second_time = '{time_list[1]}', third_time = '{time_list[2]}' WHERE user_id = '{id_of_user}';")
+            f"UPDATE subers SET user_schedule = ARRAY{time_list} WHERE user_id = '{id_of_user}';")
         self.conn.commit()
+
+        logging('updating', 'User', id_of_user, data[1], data[2], 'set new schedule', *time_list)
 
         return True
 
     # Updating Subscriber newsletter status OR creating new Subscriber in database
     def newsletter_status(self, id_of_user, firstname, lastname, status):
         if self.check_user_in_db(id_of_user):
+            # If the users current status is the status he wants to set
+            if self.get_user_status(id_of_user)[0] is status:
+                return
             self.cur.execute(f"UPDATE subers set status = {status} WHERE user_id = '{id_of_user}';")
             self.conn.commit()
-            logging('updating', 'User', id_of_user, firstname, lastname, status)
+            logging('updating', 'User', id_of_user, firstname, lastname, 'update status on', status)
         else:
             self.add_user(id_of_user, firstname, lastname, status)
 
@@ -89,9 +95,9 @@ class DBController:
         return list(self.cur.fetchall())
 
     def get_user_status(self, id_of_user):
-        self.cur.execute(f"SELECT status, first_time, second_time, third_time FROM subers WHERE user_id='{id_of_user}';")
+        self.cur.execute(f"SELECT status, user_schedule FROM subers WHERE user_id='{id_of_user}';")
         data = self.cur.fetchone()
-        return data[0], data[1::]
+        return data[0], data[1]
 
 
 # Returning format answer with Data

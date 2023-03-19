@@ -20,6 +20,8 @@ DB_PASSWORD = os.getenv('PGPASSWORD')
 DB_HOST = os.getenv('PGHOST')
 DB_PORT = os.getenv('PGPORT')
 
+MAX_COUNT_USER_TIME = os.getenv('MAX_USER_TIMES')
+
 # Assets
 start_answer = """
 Witam!
@@ -34,8 +36,6 @@ set_schedule_success = """
 Hura! Czas został ustawiony.
 Teraz będę wysyłał do ciebie wiadomości o:
 {}
-{}
-{}
 
 Pomyślnie zostałeś zapizany do Newsletter.
 Jeśli chcesz zmienić czas - wpisz /change_time
@@ -45,8 +45,6 @@ already_subscribed = """
 Już jesteś zapiany do Newslettera.
 
 Twój ustawiony czas:
-{}
-{}
 {}
 
 Jeśli chcesz zmienić czas - wpisz /change_time
@@ -70,11 +68,13 @@ Wpisz /help aby dowiedzieć się więcej.
 """
 
 time_format_advice = """
-Wpisz po przecinku Godzinę o której chcesz dostawać wiadomości.
+Wpisz po przecinku Godzinę o której chcesz dostawać wiadomości. ( Maskymalnie 5 )
 Pamiętaj aby godzina była podana w formacie 24 i liczba minut była wielokrotnością 10
 
 Przykład:
-10:30, 14:30, 22:40"""
+10:30, 14:30, 22:40
+ lub
+9:30, 15:30, 16:30, 18:30"""
 
 invalid_time = """
 Czas został wprowadzony w błędny sposób.
@@ -82,6 +82,8 @@ Spróbuj jeszcze raz.
 
 Przykład:
 10:30, 14:30, 22:40
+ lub
+9:30, 15:30, 16:30, 18:30
 """
 
 help_answer = """
@@ -89,7 +91,8 @@ Cześć!
 Widzę że potrzebujesz pomocy.
 Komendy:
 Wpisz /crypto aby sprawdić kurs Bitcoin i Ethereum
-Wpisz /add aby zapisać się do Newsletter
+Wpisz /add aby zapisać się do Newsletter lub sprawdzić bierzący rozkład wysyłania Newsletter
+Wpisz /change_time aby zmienić ustawiony rozkład
 Wpisz /unadd aby wypisać się z Newsletter
 Informacja:
 
