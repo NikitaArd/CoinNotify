@@ -6,9 +6,16 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import sys
 
 # Local imports
+from settings import (
+    TOKEN,
+    SERVICED_COINS,
+    MAX_COUNT_USER_COINS,
+    TIME_UNIT,
+    INTERVAL
+)
 from assets import *
+from db import DBController
 from tools import (
-    DBController,
     logging,
     validate_user_time,
     calc_timezone,
@@ -18,7 +25,7 @@ from tools import (
 )
 
 bot = telebot.TeleBot(TOKEN)
-db = DBController(DB_NAME)
+db = DBController()
 
 
 def check_time():
@@ -108,12 +115,12 @@ def process_set_coin_list_step(message, single_mode=True):
     # Check if user input coins are serviced by the server
     for coin in coin_list:
         if coin not in SERVICED_COINS:
-            bot.send_message(message.chat.id, invalid_coin.format(coin))
+            bot.send_message(message.chat.id, invalid_coin_name.format(coin))
             bot.register_next_step_handler(message, process_set_coin_list_step)
             return
 
     if not db.set_user_coin_list(message.from_user.id, coin_list):
-        bot.send_message(message.chat.id, invalid_coin)
+        bot.send_message(message.chat.id, invalid_coin_name)
         bot.register_next_step_handler(message, process_set_coin_list_step)
 
     bot.send_message(message.chat.id, your_coin_list.format('\n'.join(format_coin_list(coin_list))))
