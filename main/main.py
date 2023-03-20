@@ -9,10 +9,12 @@ import sys
 from assets import *
 from tools import (
     DBController,
-    get_parse_data,
     logging,
     validate_user_time,
     calc_timezone,
+    format_coin_list,
+    get_crypto_data,
+    get_crypto_data_by_user_settings
 )
 
 bot = telebot.TeleBot(TOKEN)
@@ -28,13 +30,16 @@ def check_time():
 def mailing(cur_time):
     # Try to Add cur_time into SQL request
     subers = db.get_users_with_status(True)
-    table = get_parse_data()
+    table = get_crypto_data_by_user_settings(subers)
+
+    # Step 1 generating Dict {user_id: custom_user_answer}
+    # Step 2 sending all messages
 
     mailing_count = 0
     for s in subers:
         if cur_time in s[6]:
             mailing_count += 1
-            bot.send_message(s[3], table)
+            bot.send_message(s[3], table[s[3]])
 
     logging('mailing', mailing_count, 'user(s)')
 
@@ -61,7 +66,7 @@ def process_get_time_step(message):
         bot.register_next_step_handler(message, process_get_time_step)
 
 
-def process_set_schedule_step(message):
+def process_set_schedule_step(message, single_mode=True):
     # Getting user input time ['HH:MM', 'HH:MM', 'HH:MM']
     user_time_list = message.text.replace(' ', '').split(',')
 
@@ -78,11 +83,46 @@ def process_set_schedule_step(message):
         bot.send_message(message.chat.id, invalid_time)
         bot.register_next_step_handler(message, process_set_schedule_step)
 
-    db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
+    # db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
     bot.send_message(message.chat.id, set_schedule_success.format('\n'.join(user_time_list)))
 
+    if not single_mode:
+        add(message)
 
-@bot.message_handler(commands=['change_time'])
+
+@bot.message_handler(commands=['set_coin_list'])
+def set_coin_list(message):
+    bot.send_message(message.chat.id, set_coins)
+    bot.send_message(message.chat.id, coin_list_advice)
+    bot.register_next_step_handler(message, process_set_coin_list_step)
+
+
+def process_set_coin_list_step(message, single_mode=True):
+    coin_list = message.text.replace(' ', '').upper().split(',')
+
+    if len(coin_list) > MAX_COUNT_USER_COINS:
+        bot.send_message(message.chat.id, invalid_max_coin.format(MAX_COUNT_USER_COINS))
+        bot.register_next_step_handler(message, process_set_coin_list_step)
+        return
+
+    # Check if user input coins are serviced by the server
+    for coin in coin_list:
+        if coin not in SERVICED_COINS:
+            bot.send_message(message.chat.id, invalid_coin.format(coin))
+            bot.register_next_step_handler(message, process_set_coin_list_step)
+            return
+
+    if not db.set_user_coin_list(message.from_user.id, coin_list):
+        bot.send_message(message.chat.id, invalid_coin)
+        bot.register_next_step_handler(message, process_set_coin_list_step)
+
+    bot.send_message(message.chat.id, your_coin_list.format('\n'.join(format_coin_list(coin_list))))
+
+    if not single_mode:
+        add(message)
+
+
+@bot.message_handler(commands=['set_time'])
 def change_schedule(message):
     bot.send_message(message.chat.id, 'Ustaw nowy czas')
     bot.send_message(message.chat.id, time_format_advice)
@@ -92,18 +132,30 @@ def change_schedule(message):
 @bot.message_handler(commands=['add'])
 def add(message):
     user_time = db.check_user_set_time(message.from_user.id)
+    user_coin_list = db.check_user_set_coin_list(message.from_user.id)
     if not user_time[0]:
-        bot.send_message(message.chat.id, "Widzę że nie masz ustawionego czasu")
+        bot.send_message(message.chat.id, time_not_set)
         bot.send_message(message.chat.id, time_format_advice)
-        bot.register_next_step_handler(message, process_set_schedule_step)
+        bot.register_next_step_handler(message, process_set_schedule_step, single_mode=False)
+
+    elif not user_coin_list[0]:
+        bot.send_message(message.chat.id, coin_list_not_set)
+        bot.send_message(message.chat.id, coin_list_advice)
+        bot.register_next_step_handler(message, process_set_coin_list_step, single_mode=False)
+
     else:
-        cur_user_status, cur_user_set_time = db.get_user_status(message.from_user.id)
+        cur_user_status, cur_user_set_time, cur_user_coin_list = db.get_user_status(message.from_user.id)
         # If user already subscribed send an appropriate answer
         if cur_user_status:
-            bot.send_message(message.chat.id, already_subscribed.format('\n'.join(cur_user_set_time)))
+            bot.send_message(message.chat.id, already_subscribed.format('\n'.join(cur_user_set_time),
+                                                                        '\n'.join(
+                                                                            format_coin_list(cur_user_coin_list))))
+            bot.send_message(message.chat.id, set_time_coin_advice)
         else:
             db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
-            bot.send_message(message.chat.id, set_schedule_success.format('\n'.join(user_time[0])))
+            bot.send_message(message.chat.id, user_subscribed.format('\n'.join(user_time[0]),
+                                                                     '\n'.join(format_coin_list(cur_user_coin_list))))
+            bot.send_message(message.chat.id, set_time_coin_advice)
 
 
 @bot.message_handler(commands=['unadd'])
@@ -114,7 +166,7 @@ def unadd(message):
 
 @bot.message_handler(commands=['crypto'])
 def crypto(message):
-    table = get_parse_data()
+    table = get_crypto_data()
     bot.send_message(message.chat.id, table)
 
 

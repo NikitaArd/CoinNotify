@@ -10,7 +10,10 @@ from assets import (
     DB_PASSWORD,
     DB_HOST,
     DB_PORT,
-    MAX_COUNT_USER_TIME
+    MAX_COUNT_USER_TIME,
+    MAX_COUNT_USER_COINS,
+    SERVICED_COINS,
+    answer,
 )
 
 
@@ -21,6 +24,7 @@ class DBController:
     DB_HOST = DB_HOST
     DB_PORT = DB_PORT
     MAX_COUNT_USER_TIME = MAX_COUNT_USER_TIME
+    MAX_COUNT_USER_COINS = MAX_COUNT_USER_COINS
 
     def __init__(self, db_name):
         self.DBName = db_name
@@ -39,7 +43,9 @@ class DBController:
             user_id TEXT NOT NULL, 
             status BOOLEAN,
             timediff INT,
-            user_schedule text ARRAY[{}]);""".format(self.MAX_COUNT_USER_TIME))
+            user_schedule text ARRAY[{}],
+            sub_coin_list text ARRAY[{}]);""".format(self.MAX_COUNT_USER_TIME,
+                                                     self.MAX_COUNT_USER_COINS))
             self.conn.commit()
 
     # Returning Something if Subscriber exists and Nothing if Subscriber doesn't exist
@@ -49,6 +55,10 @@ class DBController:
 
     def check_user_set_time(self, id_of_user):
         self.cur.execute(f"SELECT user_schedule FROM subers WHERE user_id = '{id_of_user}';")
+        return self.cur.fetchone()
+
+    def check_user_set_coin_list(self, id_of_user):
+        self.cur.execute(f"SELECT sub_coin_list FROM subers WHERE user_id = '{id_of_user}';")
         return self.cur.fetchone()
 
     # Creating new Subscriber
@@ -77,6 +87,13 @@ class DBController:
 
         return True
 
+    def set_user_coin_list(self, id_of_user, coin_list):
+        if not self.check_user_in_db(id_of_user):
+            return False
+        self.cur.execute(f"UPDATE subers SET sub_coin_list = ARRAY{coin_list} WHERE user_id = '{id_of_user}';")
+        self.conn.commit()
+        return True
+
     # Updating Subscriber newsletter status OR creating new Subscriber in database
     def newsletter_status(self, id_of_user, firstname, lastname, status):
         if self.check_user_in_db(id_of_user):
@@ -95,28 +112,31 @@ class DBController:
         return list(self.cur.fetchall())
 
     def get_user_status(self, id_of_user):
-        self.cur.execute(f"SELECT status, user_schedule FROM subers WHERE user_id='{id_of_user}';")
+        self.cur.execute(f"SELECT status, user_schedule, sub_coin_list FROM subers WHERE user_id='{id_of_user}';")
         data = self.cur.fetchone()
-        return data[0], data[1]
+        return data[0], data[1], data[2]
 
 
 # Returning format answer with Data
-def get_parse_data():
-    cs = cryptocompare.get_price(['BTC', 'ETH'], 'USD')
-    rate_b = cs['BTC']['USD']
-    rate_e = cs['ETH']['USD']
-    # Answer ( what see user )
-    answer = f"""
-    Bitcoin :
-    💲 Kurs Bitcoin-a : {rate_b}$
-    
-    💲 Kurs Ethereum-a : {rate_e}$
-    
+def get_crypto_data() -> str:
+    cs = cryptocompare.get_price([*SERVICED_COINS], 'USD')
+    return answer.format(''.join([f"💲 {SERVICED_COINS[x]}: {cs[x]['USD']}$\n" for x in SERVICED_COINS]))
 
-    📌 Ostatnia aktualizacja : Teraz
 
-    """
-    return answer
+def get_crypto_data_by_user_settings(subers) -> dict:
+    cs = cryptocompare.get_price([*SERVICED_COINS], 'USD')
+    coin_prices = {x: f'💲 {SERVICED_COINS[x]} : {cs[x]["USD"]}$' for x in SERVICED_COINS}
+    table = dict()
+
+    # Creating a table {'user_id': 'user_naswer'}
+    for s in subers:
+        table[s[3]] = answer.format('\n'.join([coin_prices[x] for x in s[7]]))
+
+    return table
+
+
+def format_coin_list(coin_list):
+    return [f'{x}: {SERVICED_COINS[x]}' for x in coin_list]
 
 
 # Printing the specified information

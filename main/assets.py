@@ -20,9 +20,31 @@ DB_PASSWORD = os.getenv('PGPASSWORD')
 DB_HOST = os.getenv('PGHOST')
 DB_PORT = os.getenv('PGPORT')
 
-MAX_COUNT_USER_TIME = os.getenv('MAX_USER_TIMES')
+MAX_COUNT_USER_TIME = int(os.getenv('MAX_USER_TIMES'))
+MAX_COUNT_USER_COINS = int(os.getenv('MAX_USER_COINS'))
+
+SERVICED_COINS = {
+    'BTC': 'Bitcoin',
+    'ETH': 'Ethereum',
+    'USDT': 'Tether',
+    'BNB': 'BNB',
+    'USDC': 'USD Coin',
+    'XRP': 'XRP',
+    'ADA': 'Cardano',
+    'MATIC': 'Polygon',
+    'DOGE': 'Dogecoin',
+    'BUSD': 'Binance USD',
+}
 
 # Assets
+answer = """
+Cena monet:
+
+{}
+
+Ostatnia aktualizacja: Teraz
+"""
+
 start_answer = """
 Witam!
 Jestem CryptoBot, pomogę ci sprawdzić kurs Bitcoin i Ethereum
@@ -34,11 +56,9 @@ Jeśli masz pytania nie bój się pisać /help!
 
 set_schedule_success = """
 Hura! Czas został ustawiony.
-Teraz będę wysyłał do ciebie wiadomości o:
-{}
+Twój harmonogram wygląda tak:
 
-Pomyślnie zostałeś zapizany do Newsletter.
-Jeśli chcesz zmienić czas - wpisz /change_time
+{}
 """
 
 already_subscribed = """
@@ -47,7 +67,38 @@ Już jesteś zapiany do Newslettera.
 Twój ustawiony czas:
 {}
 
-Jeśli chcesz zmienić czas - wpisz /change_time
+Twoje ustawione monety:
+{}
+
+"""
+
+user_subscribed = """
+Jesteś zapisany do Newsletter.
+
+Twój ustawiony czas:
+{}
+
+Twoje ustawione monety:
+{}
+"""
+
+set_time_coin_advice = """
+Wpsiz /set_time aby zmienić ustawiony czas.
+Lub /set_coin_list aby zmienić ustawiony czas.
+"""
+
+time_not_set = """
+Widzę że nie masz ustawionego czasu wysyłania Newsletter.
+"""
+
+coin_list_not_set = """
+Widzę że nie masz ustawionej listy monet.
+"""
+
+your_coin_list = """
+Twoja lista monet:
+
+{}
 """
 
 time_tz_advice = """
@@ -56,11 +107,29 @@ Którą godzinę masz teraz ?
 To pomoże mi ustawić twóją strefę czasową. :hourglass:
 """
 
+set_coins = """
+Wpisz listę monet które chcesz otrzymywać w Newsletter.
+"""
+
 invalid_time_tz = """
 Wprowadż godzinę w formacie 24
 
 Przykład:
 10:30"""
+
+invalid_coin = """
+Przepraszam, moneta {} nie jest obługiwana przeze mnie,
+lub ona nie instnieje.
+"""
+
+invalid_max_coin = """
+Maksymalna liczba ostawionych monet to {}
+"""
+
+invalid_coin_1 = """
+Niestetu nie mogę znajść ciebie na swojej liscie.
+Wpisz /start.
+"""
 
 time_tz_ok = """
 Twoje dane zostały zapisane.
@@ -75,6 +144,14 @@ Przykład:
 10:30, 14:30, 22:40
  lub
 9:30, 15:30, 16:30, 18:30"""
+
+coin_list_advice = """
+Wpisz po przecinku sombol monety. (Maksymalnie {})
+
+Lista obsługiwanych monet:
+
+{}
+""".format(MAX_COUNT_USER_COINS, '\n'. join(f'{x}: {SERVICED_COINS[x]}' for x in SERVICED_COINS))
 
 invalid_time = """
 Czas został wprowadzony w błędny sposób.
