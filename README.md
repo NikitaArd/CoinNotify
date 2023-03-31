@@ -27,7 +27,7 @@ https://t.me/CryptoHandler_bot
 
 ## <a id='opis'></a> Opis
 
-Projekt zrobiony we właśnym zakresi w celu zdybcia nowej, i przećwiczenie obecnej wiedzy.
+Projekt zrobiony we właśnym zakresie w celu zdybcia nowej, i przećwiczenie obecnej wiedzy.
 
 </br>
 
@@ -41,7 +41,7 @@ Projekt zrobiony we właśnym zakresi w celu zdybcia nowej, i przećwiczenie obe
 | /unadd   | Po wpisaniu komendy Bot usunie użytkownika z Newslettera, ale zachowa jego ustawienia **czasu** i **listy monet**. |
 | /set_time | Bot prosi o podanie nowego czasu o której ma wysyłać Newsletter. |
 | /set_coin_list | Bot prosi o podanie nowej listy monet, które użytkownik chcę dostawać w Newletter. |
-| /help | Lista komend i którki opis projektu oraz jego twórcy. |
+| /help | Lista komend i krótki opis projektu oraz jego twórcy. |
 
 </br>
 
@@ -72,7 +72,7 @@ Projekt używa [CryptoCompare API](https://min-api.cryptocompare.com), ze wzglę
 
 ## <a id='env'></a> Plik .env
 
-Jeśli chcesz uruchomić ten projekt lokalnie, musiś w folderze projektu umieścić plik .env, który będzie zawierał następującą informację.
+Jeśli chcesz uruchomić ten projekt lokalnie, musiś w folderze projektu umieścić plik **.env**, który będzie zawierał następującą informację.
 
 ### Uzupełni
 ```
@@ -95,7 +95,7 @@ PGHOST='127.0.0.1'
 PGPORT='5432'
 ```
 
-### Nie zmianiaj
+### Nie zmieniaj
 ```
 TIME_UNIT='m'
 INTERVAL='1'
