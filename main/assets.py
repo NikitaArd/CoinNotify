@@ -145,11 +145,13 @@ Jeśli masz pytania nie bój się pisać /help!
 help_answer = """
 Cześć!
 Widzę że potrzebujesz pomocy.
+
 Komendy:
-Wpisz /crypto aby sprawdić kurs Bitcoin i Ethereum
-Wpisz /add aby zapisać się do Newsletter lub sprawdzić bierzący rozkład wysyłania Newsletter
-Wpisz /change_time aby zmienić ustawiony rozkład
-Wpisz /unadd aby wypisać się z Newsletter
+ - Wpisz /crypto aby sprawdić cenę 10 najpopularniejszych monet.
+ - Wpisz /add aby zapisać się do Newsletter lub sprawdzić aktualny czas wysyłania Newsletter.
+ - Wpisz /set_time aby zmienić ustawiony czas wysyłania Newsletter.
+ - Wpisz /set_coin_list aby zmienić ustawioną listę monet w Newsletter.
+ - Wpisz /unadd aby wypisać się z Newsletter.
 Informacja:
 
 Twórca Nikita Smolenskyi
