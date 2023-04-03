@@ -50,5 +50,15 @@ def validate_user_time(input_time: str, validate_minutes=False) -> bool:
     return False
 
 
+# Takes time and format it with difference of server and client times
+def format_time_with_diff(u_time: str, time_diff: int) -> str:
+    formatted_hours = int(u_time.split(':')[0]) + time_diff
+    return ''.join([str(formatted_hours), ':', u_time.split(':')[1]])
+
+
+def format_user_time_list(user_time_list: list, time_diff: int) -> list:
+    return [format_time_with_diff(ut, time_diff) for ut in user_time_list]
+
+
 if __name__ == '__main__':
     pass

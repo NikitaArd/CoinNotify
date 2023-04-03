@@ -8,8 +8,6 @@ import sys
 # Local imports
 from settings import (
     TOKEN,
-    SERVICED_COINS,
-    MAX_COUNT_USER_COINS,
     TIME_UNIT,
     INTERVAL
 )
@@ -21,7 +19,8 @@ from tools import (
     calc_timezone,
     format_coin_list,
     get_crypto_data,
-    get_crypto_data_by_user_settings
+    get_crypto_data_by_user_settings,
+    format_user_time_list
 )
 
 bot = telebot.TeleBot(TOKEN)
@@ -151,17 +150,20 @@ def add(message):
         bot.register_next_step_handler(message, process_set_coin_list_step, single_mode=False)
 
     else:
-        cur_user_status, cur_user_set_time, cur_user_coin_list = db.get_user_status(message.from_user.id)
+        cur_user_object = db.get_user_status(message.from_user.id)
         # If user already subscribed send an appropriate answer
-        if cur_user_status:
-            bot.send_message(message.chat.id, already_subscribed.format('\n'.join(cur_user_set_time),
+        if cur_user_object[4]:
+            bot.send_message(message.chat.id, already_subscribed.format('\n'.join(
+                                                                            format_user_time_list(cur_user_object[6],
+                                                                                                  cur_user_object[5])),
                                                                         '\n'.join(
-                                                                            format_coin_list(cur_user_coin_list))))
+                                                                            format_coin_list(cur_user_object[7]))))
             bot.send_message(message.chat.id, set_time_coin_advice)
         else:
             db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
-            bot.send_message(message.chat.id, user_subscribed.format('\n'.join(user_time[0]),
-                                                                     '\n'.join(format_coin_list(cur_user_coin_list))))
+            bot.send_message(message.chat.id, user_subscribed.format('\n'.join(format_user_time_list(cur_user_object[6],
+                                                                                                  cur_user_object[5])),
+                                                                     '\n'.join(format_coin_list(cur_user_object[7]))))
             bot.send_message(message.chat.id, set_time_coin_advice)
 
 

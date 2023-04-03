@@ -113,6 +113,6 @@ class DBController:
         return list(self.cur.fetchall())
 
     def get_user_status(self, id_of_user):
-        self.cur.execute(f"SELECT status, user_schedule, sub_coin_list FROM subers WHERE user_id='{id_of_user}';")
+        self.cur.execute(f"SELECT * FROM subers WHERE user_id='{id_of_user}';")
         data = self.cur.fetchone()
-        return data[0], data[1], data[2]
+        return data
