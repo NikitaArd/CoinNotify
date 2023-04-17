@@ -6,12 +6,19 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import sys
 
 # Local imports
+import settings
+
 from settings import (
     TOKEN,
     TIME_UNIT,
-    INTERVAL
+    INTERVAL,
 )
-from assets import *
+
+if settings.LANG == 'PL':
+    from assets_PL import *
+else:
+    from assets_EN import *
+
 from db import DBController
 from tools import (
     logging,
@@ -200,6 +207,7 @@ if __name__ == '__main__':
         logging('error', 'Invalid time unit')
         sys.exit()
     logging('info', 'Logging is turned ON every', INTERVAL, TIME_UNIT)
+    logging('info', 'Set language is', ASSETS_LANG)
 
     main()
 

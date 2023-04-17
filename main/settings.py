@@ -36,3 +36,5 @@ SERVICED_COINS = {
     'DOGE': 'Dogecoin',
     'BUSD': 'Binance USD',
 }
+
+LANG = os.getenv('LANG')

@@ -7,8 +7,14 @@ import datetime
 import re
 
 # Local import
+import settings
+
 from settings import SERVICED_COINS
-from assets import answer
+
+if settings.LANG == 'PL':
+    from assets_PL import *
+else:
+    from assets_EN import *
 
 
 # Returning format answer with Data
