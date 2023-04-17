@@ -137,7 +137,7 @@ def process_set_coin_list_step(message, single_mode=True):
 
 @bot.message_handler(commands=['set_time'])
 def change_schedule(message):
-    bot.send_message(message.chat.id, 'Ustaw nowy czas')
+    bot.send_message(message.chat.id, set_new_schedule)
     bot.send_message(message.chat.id, time_format_advice)
     bot.register_next_step_handler(message, process_set_schedule_step)
 

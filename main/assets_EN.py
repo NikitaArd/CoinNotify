@@ -79,6 +79,8 @@ set_coins = """
 Enter a list of coins that you want to get in Newsletter.
 """
 
+set_new_schedule = 'Set new schedule'
+
 # Information
 answer = """
 Coin prices:
