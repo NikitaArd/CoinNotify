@@ -144,33 +144,34 @@ def change_schedule(message):
 
 @bot.message_handler(commands=['add'])
 def add(message):
-    user_time = db.check_user_set_time(message.from_user.id)
-    user_coin_list = db.check_user_set_coin_list(message.from_user.id)
-    if not user_time[0]:
+    if not db.check_field(message.from_user.id, 'user_schedule'):
         bot.send_message(message.chat.id, time_not_set)
         bot.send_message(message.chat.id, time_format_advice)
         bot.register_next_step_handler(message, process_set_schedule_step, single_mode=False)
 
-    elif not user_coin_list[0]:
+    elif not db.check_field(message.from_user.id, 'sub_coin_list'):
         bot.send_message(message.chat.id, coin_list_not_set)
         bot.send_message(message.chat.id, coin_list_advice)
         bot.register_next_step_handler(message, process_set_coin_list_step, single_mode=False)
 
     else:
-        cur_user_object = db.get_user_status(message.from_user.id)
+        cur_user = db.get_user(message.from_user.id)
+
+        if not cur_user[0]:
+            return
         # If user already subscribed send an appropriate answer
-        if cur_user_object[4]:
+        if cur_user[4]:
             bot.send_message(message.chat.id, already_subscribed.format('\n'.join(
-                                                                            format_user_time_list(cur_user_object[6],
-                                                                                                  cur_user_object[5])),
+                                                                            format_user_time_list(cur_user[6],
+                                                                                                  cur_user[5])),
                                                                         '\n'.join(
-                                                                            format_coin_list(cur_user_object[7]))))
+                                                                            format_coin_list(cur_user[7]))))
             bot.send_message(message.chat.id, set_time_coin_advice)
         else:
             db.newsletter_status(message.from_user.id, message.from_user.first_name, message.from_user.last_name, True)
-            bot.send_message(message.chat.id, user_subscribed.format('\n'.join(format_user_time_list(cur_user_object[6],
-                                                                                                  cur_user_object[5])),
-                                                                     '\n'.join(format_coin_list(cur_user_object[7]))))
+            bot.send_message(message.chat.id, user_subscribed.format('\n'.join(format_user_time_list(cur_user[6],
+                                                                                                  cur_user[5])),
+                                                                     '\n'.join(format_coin_list(cur_user[7]))))
             bot.send_message(message.chat.id, set_time_coin_advice)
 
 
