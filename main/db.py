@@ -61,7 +61,7 @@ class DBController:
 
         return bool(self.cur.fetchone()[0])
 
-    def add_user(self, id_of_user: str, firstname: str, lastname: str, timediff: int, status:bool = False):
+    def add_user(self, id_of_user: str, firstname: str, lastname: str, timediff: int, status: bool = False):
         """
         Creates new user
         """

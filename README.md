@@ -1,6 +1,6 @@
 # telegram-crypto-bot
 
-Link do bota:
+🔗 Link to the bot:
 
 https://t.me/CryptoHandler_bot
 
@@ -10,38 +10,38 @@ https://t.me/CryptoHandler_bot
 
 </br>
 
-## Spis treści
+## 📌 Content
 
- - Opis
-   - [Opis projektu](#opis)
-   - [Komendy](#komendy)
- - Technologię
-   - [Biblioteki](#biblioteki)
+ - Description
+   - [Project description](#description)
+   - [Cammands](#commands)
+ - Technologies
+   - [Libraries](#libs)
    - [API](#api)
- - Inna informacja
-   - [Plik .env](#env)
+ - Other information
+   - [.env file](#env)
 
 </br>
 
 ---
 
-## <a id='opis'></a> Opis
+## <a id='description'></a> 📃 Description
 
-Projekt zrobiony we właśnym zakresie w celu zdybcia nowej, i przećwiczenie obecnej wiedzy.
+You send to Bot up to 5 timestamps and up to 5 coin abbreviation and It sends You current price of this coins, exactly at your set time !
 
 </br>
 
-## <a id='komendy'></a> Bot obsługuje następujące komendy:
+## <a id='commands'></a> Bot commands:
 
-| Komenda | Opis |
+| Command | Desription |
 | ------------- | ------------- |
-| /start  | Wywołuje się automatycznie po kliklnięciu przycisku start. Po wpisaniu tej komendy Bot przywita się i **zapyta o czas aby ustawić w jakiej strefie czasowej znajduję się użytkownik**. |
-| /crypto  | Bot wysyła listę cenę różnych monet. |
-| /add     | Po wpisaniu konmendy Bot zapiszę użytkownika do Newslettera, jeśli użytkownik ma ustawiony **czas** i **listę monet**. |
-| /unadd   | Po wpisaniu komendy Bot usunie użytkownika z Newslettera, ale zachowa jego ustawienia **czasu** i **listy monet**. |
-| /set_time | Bot prosi o podanie nowego czasu o której ma wysyłać Newsletter. |
-| /set_coin_list | Bot prosi o podanie nowej listy monet, które użytkownik chcę dostawać w Newletter. |
-| /help | Lista komend i krótki opis projektu oraz jego twórcy. |
+| /start  | Calls automaticlly when the start button is clicked. The Bot will say hello and **ask about your current time to set your time zone**. |
+| /crypto  | The bot sends you current price of 10 most popular coins. |
+| /add     | After entering the command, Bot will add the user to the Newsletter, if user has set **time** and **coin list**. |
+| /unadd   | After entering the command Bot will unsubscribe the user from the Newsletter, but save his **time** and **coint list**. |
+| /set_time | The Bot will ask to enter new timestamps ( up to 5 ) |
+| /set_coin_list | The Bot will ask to enter new 5 coin abbreviation ( up to 5 ) |
+| /help | Command list and brief description about this project and author |
 
 </br>
 
@@ -49,9 +49,9 @@ Projekt zrobiony we właśnym zakresie w celu zdybcia nowej, i przećwiczenie ob
 
 </br>
 
-## <a id='biblioteki'></a> Biblioteki
+## <a id='libs'></a> Libraries
 
-| Nazwa | Wersja |
+| Name | Version |
 | ------------- | ------------- |
 | PyTelegramBotAPI | 4.10.0 |
 | psycopg2 | 2.9.5 |
@@ -61,8 +61,7 @@ Projekt zrobiony we właśnym zakresie w celu zdybcia nowej, i przećwiczenie ob
 
 ## <a id='api'></a> API
 
-
-Projekt używa [CryptoCompare API](https://min-api.cryptocompare.com), ze względu na swoją dostępność i brak ograniczeń na zayptania bez klucza.
+The Bot uses [CryptoCompare API](https://min-api.cryptocompare.com), due to its availability and no limit of requests without a key.
 
 </br>
 
@@ -70,32 +69,32 @@ Projekt używa [CryptoCompare API](https://min-api.cryptocompare.com), ze wzglę
 
 </br>
 
-## <a id='env'></a> Plik .env
+## <a id='env'></a> 🔧 Plik .env
 
-Jeśli chcesz uruchomić ten projekt lokalnie, musiś w folderze projektu umieścić plik **.env**, który będzie zawierał następującą informację.
+If you want to run this project on your local machine, you need to paste **.env** file in your project directory, which contains next information.
 
-### Uzupełni
+### Complete
 ```
-# Unikatowy klucz bota
+# Unique bots key
 TOKEN=''
 
-# Nazwa bazy danych
+# Database name
 PGDATABASE=''
 
-# Nazwa użytkownika
+# Database User name
 PGUSER=''
 
-# Hasło użytkownika
+# Database User password
 PGPASSWORD=''
 
-# Adres hosta bazy danych 
+# Host address of database
 PGHOST='127.0.0.1'
 
-# Port hosta bazy danych
+# Host port of database
 PGPORT='5432'
 ```
 
-### Nie zmieniaj
+### Do not change
 ```
 TIME_UNIT='m'
 INTERVAL='1'
