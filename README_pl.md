@@ -1,4 +1,4 @@
-# telegram-crypto-bot
+# CoinTrackerBot
 
 Link do bota:
 
