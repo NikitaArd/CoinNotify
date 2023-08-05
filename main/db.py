@@ -58,8 +58,11 @@ class DBController:
             self.cur.execute(f"SELECT {field.lower()} FROM subers WHERE user_id = '{id_of_user}';")
         else:
             raise Exception('Invalid field name')
-
-        return bool(self.cur.fetchone()[0])
+        
+        try:
+            return bool(self.cur.fetchone()[0])
+        except TypeError:
+            return False
 
     def add_user(self, id_of_user: str, firstname: str, lastname: str, timediff: int, status: bool = False):
         """
