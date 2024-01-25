@@ -22,7 +22,7 @@ CoinNotify is a Telegram bot delivering tailored cryptocurrency price updates to
 
 ## 💻 Usage
 
-Access the project at the following URL: [taskmaster.nikita-smolenskyi.pl](https://taskmaster.nikita-smolenskyi.pl)
+The project can be reached via the following URL: [CoinNotify](https://t.me/CryptoHandler_bot)
 
 ## 🌱 Contribution Guidelines
 
