@@ -1,0 +1,24 @@
+services:
+  app:
+    build: ./main
+  
+    command: sh -c "python main.py"
+
+    env_file:
+      - .env
+    links:
+      - postgres
+
+  postgres:
+    image: postgres:15
+
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - POSTGRES_DB=${PGDATABASE}
+    volumes:
+      - coin-notify-db:/var/lib/postgresql/data
+
+volumes:
+  coin-notify-db:
