@@ -2,27 +2,9 @@
 
 CoinNotify is a Telegram bot delivering tailored cryptocurrency price updates to users at their preferred times. Stay informed about Bitcoin, Ethereum, and more, never missing out on crucial market movements.
 
-## 🚦 Project status
-
-- [x] Live 🚀 
-  
-- [ ] Completed ✅
-  
-- [ ] Testing 🔎
-  
-- [ ] OnHold ⏸️
-  
-- [ ] In Development 🛠️
-  
-- [ ] Planned 📆
-
 ## 🖼️ Screenshots/Demo
 
 ![Gif preview](README_static/demo.gif)
-
-## 💻 Usage
-
-The project can be reached via the following URL: [CoinNotify](https://t.me/CryptoHandler_bot)
 
 ## 🌱 Contribution Guidelines
 
